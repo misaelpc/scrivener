@@ -159,10 +159,8 @@ defmodule Scrivener do
       |> distinct(true)
       |> repo.all
     else
-      query
-      |> limit([_], ^page_size)
-      |> offset([_], ^offset)
-      |> repo.all
+      up_limit = offset + page_size
+      fetch_data = Ecto.Adapters.SQL.query(repo, "WITH \"hades_results\" AS (SELECT *,ROW_NUMBER() OVER (ORDER BY \"issue_date\" DESC) AS rowNum from  \"hades_sealed_cfdis\") SELECT * FROM \"hades_results\" WHERE rowNum >= #{offset} and RowNum <= #{up_limit}" , [])
     end
   end
 
