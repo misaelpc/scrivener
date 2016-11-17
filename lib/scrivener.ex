@@ -142,6 +142,11 @@ defmodule Scrivener do
   end
 
   defp entries(query, repo, page_number, page_size) do
+    IO.inspect "=== entries ==="
+    IO.inspect query
+    IO.inspect repo
+    IO.inspect page_number
+    IO.inspect page_size
     offset = page_size * (page_number - 1)
 
     if joins?(query) do
