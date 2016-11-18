@@ -207,7 +207,7 @@ defmodule Scrivener do
               true ->
                 {{yyyy, mm, dd}, _} = value
                 query_str <> "AND issue_date >= '#{yyyy}-#{mm}-#{dd}'"
-              false
+              false ->
                 query_str <> "WHERE issue_date >= '#{yyyy}-#{mm}-#{dd}'"
             end
         end
