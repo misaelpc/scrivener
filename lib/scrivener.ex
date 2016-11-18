@@ -188,8 +188,25 @@ defmodule Scrivener do
           "" ->
             query_str
           value ->
-            query_str = query_str <> "WHERE rfc_emitter = '#{rfc_emitter}'"
+            query_str <> " WHERE rfc_emitter = '#{rfc_emitter}' "
         end
+
+      query_str = 
+        case folio do
+          "" ->
+            query_str
+          value ->
+            case String.contains?(query_str, "WHERE") do
+              true ->
+                query_str <> "AND receipt_folio = '#{folio}' "
+              false ->
+                query_str <> "WHERE receipt_folio = '#{folio}' "
+            end
+        end
+
+        IO.inspect "=== filters ==="
+        IO.inspect fecha_inicio
+
 
       query_str = query_str <> ") SELECT * FROM \"hades_results\" WHERE rowNum >= #{offset} and RowNum <= #{up_limit}"
       IO.inspect query_str
