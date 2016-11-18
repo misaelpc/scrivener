@@ -170,15 +170,30 @@ defmodule Scrivener do
         |> limit([_], ^page_size)
         |> offset([_], ^offset)
 
-      IO.inspect "=== to_sql ==="
       {_, query_params} = Ecto.Adapters.SQL.to_sql(:all, repo, query)
-      IO.inspect query_params
+
+      rfc_emitter = Enum.at(query_params, 0)
+      serie = Enum.at(query_params, 1)
+      folio = Enum.at(query_params, 2)
+      fecha_inicio = Enum.at(query_params, 3)
+      fecha_fin = Enum.at(query_params, 4)
+      tipo_comprobante = Enum.at(query_params, 5)
 
       up_limit = offset + page_size
-      query_str = "WITH \"hades_results\" AS (SELECT *,ROW_NUMBER() OVER (ORDER BY \"issue_date\" DESC) AS rowNum from  \"hades_sealed_cfdis\") SELECT * FROM \"hades_results\" WHERE rowNum >= #{offset} and RowNum <= #{up_limit}"
-      Ecto.Adapters.SQL.query(repo, query_str, [])
+      query_str = "WITH \"hades_results\" AS (SELECT *, ROW_NUMBER() OVER (ORDER BY \"issue_date\" DESC) AS rowNum from \"hades_sealed_cfdis\""
 
-      #repo.all(query)
+      #filters
+      query_str =
+        case rfc_emitter do
+          "" ->
+            query_str
+          value ->
+            query_str = query_str <> "WHERE rfc_emitter = '#{rfc_emitter}'"
+        end
+
+      query_str = query_str <> ") SELECT * FROM \"hades_results\" WHERE rowNum >= #{offset} and RowNum <= #{up_limit}"
+      IO.inspect query_str
+      Ecto.Adapters.SQL.query(repo, query_str, [])
     end
   end
 
