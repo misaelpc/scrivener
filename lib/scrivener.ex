@@ -243,6 +243,7 @@ defmodule Scrivener do
   end
 
   defp total_entries(query, repo) do
+    IO.inspect "total_entries"
     primary_key = query.from
     |> elem(1)
     |> apply(:__schema__, [:primary_key])
