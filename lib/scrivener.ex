@@ -142,12 +142,6 @@ defmodule Scrivener do
   end
 
   defp entries(query, repo, page_number, page_size) do
-    IO.inspect "=== entries ==="
-    IO.inspect query
-    IO.inspect repo
-    IO.inspect page_number
-    IO.inspect page_size
-    
     offset = page_size * (page_number - 1)
 
     if joins?(query) do
@@ -204,11 +198,22 @@ defmodule Scrivener do
             end
         end
 
-        IO.inspect "=== filters ==="
-        IO.inspect fecha_inicio
-
+      query_str =
+        case fecha_inicio do
+          {{1, 1, 1}, {0, 0, 0, 0}} ->
+            query_str
+          value ->
+            case String.contains?(query_str, "WHERE") do
+              true ->
+                {{yyyy, mm, dd}, _} = value
+                query_str <> "AND issue_date >= '#{yyyy}-#{mm}-#{dd}'"
+              false
+                query_str <> "WHERE issue_date >= '#{yyyy}-#{mm}-#{dd}'"
+            end
+        end
 
       query_str = query_str <> ") SELECT * FROM \"hades_results\" WHERE rowNum >= #{offset} and RowNum <= #{up_limit}"
+      IO.inspect "=== query_str ==="
       IO.inspect query_str
       Ecto.Adapters.SQL.query(repo, query_str, [])
     end
