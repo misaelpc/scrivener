@@ -220,9 +220,9 @@ defmodule Scrivener do
             {{yyyy, mm, dd}, _} = value
             case String.contains?(query_str, "WHERE") do
               true ->
-                query_str <> " AND issue_date <= '#{yyyy}-#{mm}-#{dd}' "
+                query_str <> " AND issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
               false ->
-                query_str <> " WHERE issue_date <= '#{yyyy}-#{mm}-#{dd}' "
+                query_str <> " WHERE issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
             end
         end
 
