@@ -147,6 +147,7 @@ defmodule Scrivener do
     IO.inspect repo
     IO.inspect page_number
     IO.inspect page_size
+    
     offset = page_size * (page_number - 1)
 
     if joins?(query) do
@@ -164,8 +165,15 @@ defmodule Scrivener do
       |> distinct(true)
       |> repo.all
     else
-      up_limit = offset + page_size
-      fetch_data = Ecto.Adapters.SQL.query(repo, "WITH \"hades_results\" AS (SELECT *,ROW_NUMBER() OVER (ORDER BY \"issue_date\" DESC) AS rowNum from  \"hades_sealed_cfdis\") SELECT * FROM \"hades_results\" WHERE rowNum >= #{offset} and RowNum <= #{up_limit}" , [])
+      query = 
+        query
+        |> limit([_], ^page_size)
+        |> offset([_], ^offset)
+
+      IO.inspect "=== to_sql ==="
+      Ecto.Adapters.SQL.to_sql(:all, repo, query)
+
+      repo.all(query)
     end
   end
 
