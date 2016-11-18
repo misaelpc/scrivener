@@ -192,9 +192,9 @@ defmodule Scrivener do
           value ->
             case String.contains?(query_str, "WHERE") do
               true ->
-                query_str <> "AND receipt_folio = '#{folio}' "
+                query_str <> " AND receipt_folio = '#{folio}' "
               false ->
-                query_str <> "WHERE receipt_folio = '#{folio}' "
+                query_str <> " WHERE receipt_folio = '#{folio}' "
             end
         end
 
@@ -206,15 +206,27 @@ defmodule Scrivener do
             {{yyyy, mm, dd}, _} = value
             case String.contains?(query_str, "WHERE") do
               true ->
-                query_str <> "AND issue_date >= '#{yyyy}-#{mm}-#{dd}'"
+                query_str <> " AND issue_date >= '#{yyyy}-#{mm}-#{dd}' "
               false ->
-                query_str <> "WHERE issue_date >= '#{yyyy}-#{mm}-#{dd}'"
+                query_str <> " WHERE issue_date >= '#{yyyy}-#{mm}-#{dd}' "
+            end
+        end
+
+      query_str =
+        case fecha_fin do
+          {{1, 1, 1}, {0, 0, 0, 0}} ->
+            query_str
+          value ->
+            {{yyyy, mm, dd}, _} = value
+            case String.contains?(query_str, "WHERE") do
+              true ->
+                query_str <> " AND issue_date <= '#{yyyy}-#{mm}-#{dd}' "
+              false ->
+                query_str <> " WHERE issue_date <= '#{yyyy}-#{mm}-#{dd}' "
             end
         end
 
       query_str = query_str <> ") SELECT * FROM \"hades_results\" WHERE rowNum >= #{offset} and RowNum <= #{up_limit}"
-      IO.inspect "=== query_str ==="
-      IO.inspect query_str
       Ecto.Adapters.SQL.query(repo, query_str, [])
     end
   end
