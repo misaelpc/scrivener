@@ -171,7 +171,7 @@ defmodule Scrivener do
         |> offset([_], ^offset)
 
       IO.inspect "=== to_sql ==="
-      Ecto.Adapters.SQL.to_sql(:all, repo, query)
+      IO.inspect Ecto.Adapters.SQL.to_sql(:all, repo, query)
 
       repo.all(query)
     end
