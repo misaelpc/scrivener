@@ -254,7 +254,7 @@ defmodule Scrivener do
       |> remove_clauses
       |> exclude(:order_by)
       |> select([m], count(field(m, ^primary_key), :distinct))
-
+      #|> repo.one!
     {_, query_params} = Ecto.Adapters.SQL.to_sql(:all, repo, query)
 
     rfc_emitter = Enum.at(query_params, 0)
@@ -318,13 +318,9 @@ defmodule Scrivener do
 
     IO.inspect "===query==="
     IO.inspect query_str
-    IO.inspect Ecto.Adapters.SQL.query!(repo, query_str, [])
+    %{columns: _, command: _, num_rows: 1, rows: [[result]]} = Ecto.Adapters.SQL.query!(repo, query_str, [])
 
-
-    IO.inspect "===result==="
-    IO.inspect result = query
-    |> repo.one!
-
+    IO.inspect result
     result
   end
 
