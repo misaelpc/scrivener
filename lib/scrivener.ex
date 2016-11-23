@@ -318,7 +318,7 @@ defmodule Scrivener do
 
     IO.inspect "===query==="
     IO.inspect query_str
-    IO.inspect Ecto.Adapters.SQL.query(repo, query_str, [])
+    IO.inspect Ecto.Adapters.SQL.query!(repo, query_str, [])
 
 
     IO.inspect "===result==="
