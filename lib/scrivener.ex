@@ -257,8 +257,11 @@ defmodule Scrivener do
 
     IO.inspect Ecto.Adapters.SQL.to_sql(:all, repo, query)
 
-    query
+    IO.inspect "===result==="
+    IO.inspect result = query
     |> repo.one!
+
+    result
   end
 
   defp total_pages(total_entries, page_size) do
