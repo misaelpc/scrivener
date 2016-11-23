@@ -249,10 +249,15 @@ defmodule Scrivener do
     |> apply(:__schema__, [:primary_key])
     |> hd
 
+    query =
+      query
+      |> remove_clauses
+      |> exclude(:order_by)
+      |> select([m], count(field(m, ^primary_key), :distinct))
+
+    IO.inspect Ecto.Adapters.SQL.to_sql(:all, repo, query)
+
     query
-    |> remove_clauses
-    |> exclude(:order_by)
-    |> select([m], count(field(m, ^primary_key), :distinct))
     |> repo.one!
   end
 
