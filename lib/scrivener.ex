@@ -243,7 +243,6 @@ defmodule Scrivener do
   end
 
   defp total_entries(query, repo) do
-    IO.inspect "total_entries"
     primary_key = query.from
     |> elem(1)
     |> apply(:__schema__, [:primary_key])
@@ -316,11 +315,8 @@ defmodule Scrivener do
           end
       end
 
-    IO.inspect "===query==="
-    IO.inspect query_str
     %{columns: _, command: _, num_rows: 1, rows: [[result]]} = Ecto.Adapters.SQL.query!(repo, query_str, [])
 
-    IO.inspect result
     result
   end
 
