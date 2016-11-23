@@ -255,7 +255,71 @@ defmodule Scrivener do
       |> exclude(:order_by)
       |> select([m], count(field(m, ^primary_key), :distinct))
 
-    IO.inspect Ecto.Adapters.SQL.to_sql(:all, repo, query)
+    {_, query_params} = Ecto.Adapters.SQL.to_sql(:all, repo, query)
+
+    rfc_emitter = Enum.at(query_params, 0)
+    serie = Enum.at(query_params, 1)
+    folio = Enum.at(query_params, 2)
+    fecha_inicio = Enum.at(query_params, 3)
+    fecha_fin = Enum.at(query_params, 4)
+    tipo_comprobante = Enum.at(query_params, 5)
+
+    query_str = "SELECT count(DISTINCT [id]) FROM [hades_sealed_cfdis]"
+
+    #filters
+    query_str =
+      case rfc_emitter do
+        "" ->
+          query_str
+        value ->
+          query_str <> " WHERE rfc_emitter = '#{rfc_emitter}' "
+      end
+
+    query_str = 
+      case folio do
+        "" ->
+          query_str
+        value ->
+          case String.contains?(query_str, "WHERE") do
+            true ->
+              query_str <> " AND receipt_folio = '#{folio}' "
+            false ->
+              query_str <> " WHERE receipt_folio = '#{folio}' "
+          end
+      end
+
+    query_str =
+      case fecha_inicio do
+        {{1, 1, 1}, {0, 0, 0, 0}} ->
+          query_str
+        value ->
+          {{yyyy, mm, dd}, _} = value
+          case String.contains?(query_str, "WHERE") do
+            true ->
+              query_str <> " AND issue_date >= '#{yyyy}-#{mm}-#{dd}' "
+            false ->
+              query_str <> " WHERE issue_date >= '#{yyyy}-#{mm}-#{dd}' "
+          end
+      end
+
+    query_str =
+      case fecha_fin do
+        {{1, 1, 1}, {0, 0, 0, 0}} ->
+          query_str
+        value ->
+          {{yyyy, mm, dd}, _} = value
+          case String.contains?(query_str, "WHERE") do
+            true ->
+              query_str <> " AND issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+            false ->
+              query_str <> " WHERE issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+          end
+      end
+
+    IO.inspect "===query==="
+    IO.inspect query_str
+    IO.inspect Ecto.Adapters.SQL.query(repo, query_str, [])
+
 
     IO.inspect "===result==="
     IO.inspect result = query
