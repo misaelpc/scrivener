@@ -226,7 +226,7 @@ defmodule Scrivener do
             end
         end
 
-      query_str = query_str <> ") SELECT * FROM \"hades_results\" WHERE rowNum >= #{offset} and RowNum <= #{up_limit}"
+      query_str = query_str <> ") SELECT * FROM \"hades_results\" WHERE rowNum > #{offset} and RowNum <= #{up_limit}"
       Ecto.Adapters.SQL.query(repo, query_str, [])
     end
   end
