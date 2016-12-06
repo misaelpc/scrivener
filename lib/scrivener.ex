@@ -186,6 +186,19 @@ defmodule Scrivener do
         end
 
       query_str = 
+        case serie do
+          "" ->
+            query_str
+          value ->
+            case String.contains?(query_str, "WHERE") do
+              true ->
+                query_str <> " AND receipt_serie = '#{serie}' "
+              false ->
+                query_str <> " WHERE receipt_serie = '#{serie}' "
+            end
+        end
+
+      query_str = 
         case folio do
           "" ->
             query_str
@@ -227,9 +240,6 @@ defmodule Scrivener do
         end
 
       query_str = query_str <> ") SELECT * FROM \"hades_results\" WHERE rowNum > #{offset} and RowNum <= #{up_limit}"
-
-      IO.inspect "query_str"
-      IO.inspect query_str
 
       Ecto.Adapters.SQL.query(repo, query_str, [])
     end
