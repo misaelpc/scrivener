@@ -174,7 +174,7 @@ defmodule Scrivener do
       tipo_comprobante = Enum.at(query_params, 5)
 
       up_limit = offset + page_size
-      query_str = "WITH \"hades_results\" AS (SELECT *, ROW_NUMBER() OVER (ORDER BY \"issue_date\" DESC) AS rowNum from \"hades_sealed_cfdis\""
+      query_str = "WITH \"hades_results\" AS (SELECT comprobantes.document_id, comprobantes.client_id, comprobantes.receipt_serie, comprobantes.receipt_folio, comprobantes.rfc_emitter, comprobantes.rfc_receiver, comprobantes.status, comprobantes.issue_date, comprobantes.receipt_type, comprobantes.total, ROW_NUMBER() OVER (ORDER BY comprobantes.\"issue_date\" DESC) AS rowNum from \"hades_cfdi_3_2_comprobantes\" AS comprobantes INNER JOIN \"hades_sealed_cfdis\" cfdis ON cfdis.id = comprobantes.document_id"
 
       #filters
       query_str =
@@ -227,6 +227,10 @@ defmodule Scrivener do
         end
 
       query_str = query_str <> ") SELECT * FROM \"hades_results\" WHERE rowNum > #{offset} and RowNum <= #{up_limit}"
+
+      IO.inspect "query_str"
+      IO.inspect query_str
+
       Ecto.Adapters.SQL.query(repo, query_str, [])
     end
   end
@@ -263,7 +267,7 @@ defmodule Scrivener do
     fecha_fin = Enum.at(query_params, 4)
     tipo_comprobante = Enum.at(query_params, 5)
 
-    query_str = "SELECT count(DISTINCT [id]) FROM [hades_sealed_cfdis]"
+    query_str = "SELECT count(DISTINCT [id]) FROM [hades_sealed_cfdis] AS cfdis INNER JOIN [hades_cfdi_3_2_comprobantes] AS comprobantes ON comprobantes.document_id = cfdis.id"
 
     #filters
     query_str =
