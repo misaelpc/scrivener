@@ -239,6 +239,19 @@ defmodule Scrivener do
             end
         end
 
+      query_str = 
+        case tipo_comprobante do
+          "" ->
+            query_str
+          value ->
+            case String.contains?(query_str, "WHERE") do
+              true ->
+                query_str <> " AND comprobantes.receipt_type = '#{tipo_comprobante}' "
+              false ->
+                query_str <> " WHERE comprobantes.receipt_type = '#{tipo_comprobante}' "
+            end
+        end
+
       query_str = query_str <> ") SELECT * FROM \"hades_results\" WHERE rowNum > #{offset} and RowNum <= #{up_limit}"
 
       Ecto.Adapters.SQL.query(repo, query_str, [])
@@ -339,6 +352,19 @@ defmodule Scrivener do
               query_str <> " AND comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
             false ->
               query_str <> " WHERE comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+          end
+      end
+
+    query_str = 
+      case tipo_comprobante do
+        "" ->
+          query_str
+        value ->
+          case String.contains?(query_str, "WHERE") do
+            true ->
+              query_str <> " AND comprobantes.receipt_type = '#{tipo_comprobante}' "
+            false ->
+              query_str <> " WHERE comprobantes.receipt_type = '#{tipo_comprobante}' "
           end
       end
 
