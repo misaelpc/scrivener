@@ -174,7 +174,7 @@ defmodule Scrivener do
       tipo_comprobante = Enum.at(query_params, 5)
 
       up_limit = offset + page_size
-      query_str = "WITH \"hades_results\" AS (SELECT comprobantes.document_id, comprobantes.client_id, comprobantes.receipt_serie, comprobantes.receipt_folio, comprobantes.rfc_emitter, comprobantes.rfc_receiver, comprobantes.status, comprobantes.issue_date, comprobantes.receipt_type, comprobantes.total, ROW_NUMBER() OVER (ORDER BY comprobantes.\"issue_date\" DESC) AS rowNum from \"hades_cfdi_3_2_comprobantes\" AS comprobantes INNER JOIN \"hades_sealed_cfdis\" cfdis ON cfdis.id = comprobantes.document_id"
+      query_str = "WITH \"hades_results\" AS (SELECT comprobantes.document_id, comprobantes.client_id, comprobantes.receipt_serie, comprobantes.receipt_folio, comprobantes.rfc_emitter, comprobantes.rfc_receiver, comprobantes.status, comprobantes.issue_date, comprobantes.receipt_type, comprobantes.total, cfdis.uuid, ROW_NUMBER() OVER (ORDER BY comprobantes.\"issue_date\" DESC) AS rowNum from \"hades_cfdi_3_2_comprobantes\" AS comprobantes INNER JOIN \"hades_sealed_cfdis\" cfdis ON cfdis.id = comprobantes.document_id"
 
       #filters
       query_str =
