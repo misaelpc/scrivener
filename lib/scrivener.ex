@@ -285,7 +285,20 @@ defmodule Scrivener do
         "" ->
           query_str
         value ->
-          query_str <> " WHERE rfc_emitter = '#{rfc_emitter}' "
+          query_str <> " WHERE comprobantes.rfc_emitter = '#{rfc_emitter}' "
+      end
+
+    query_str = 
+      case serie do
+        "" ->
+          query_str
+        value ->
+          case String.contains?(query_str, "WHERE") do
+            true ->
+              query_str <> " AND comprobantes.receipt_serie = '#{serie}' "
+            false ->
+              query_str <> " WHERE comprobantes.receipt_serie = '#{serie}' "
+          end
       end
 
     query_str = 
@@ -295,9 +308,9 @@ defmodule Scrivener do
         value ->
           case String.contains?(query_str, "WHERE") do
             true ->
-              query_str <> " AND receipt_folio = '#{folio}' "
+              query_str <> " AND comprobantes.receipt_folio = '#{folio}' "
             false ->
-              query_str <> " WHERE receipt_folio = '#{folio}' "
+              query_str <> " WHERE comprobantes.receipt_folio = '#{folio}' "
           end
       end
 
@@ -309,9 +322,9 @@ defmodule Scrivener do
           {{yyyy, mm, dd}, _} = value
           case String.contains?(query_str, "WHERE") do
             true ->
-              query_str <> " AND issue_date >= '#{yyyy}-#{mm}-#{dd}' "
+              query_str <> " AND comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd}' "
             false ->
-              query_str <> " WHERE issue_date >= '#{yyyy}-#{mm}-#{dd}' "
+              query_str <> " WHERE comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd}' "
           end
       end
 
@@ -323,9 +336,9 @@ defmodule Scrivener do
           {{yyyy, mm, dd}, _} = value
           case String.contains?(query_str, "WHERE") do
             true ->
-              query_str <> " AND issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+              query_str <> " AND comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
             false ->
-              query_str <> " WHERE issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+              query_str <> " WHERE comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
           end
       end
 
