@@ -243,6 +243,8 @@ defmodule Scrivener do
         case tipo_comprobante do
           "" ->
             query_str
+          "todos" ->
+            query_str
           value ->
             case String.contains?(query_str, "WHERE") do
               true ->
@@ -358,6 +360,8 @@ defmodule Scrivener do
     query_str = 
       case tipo_comprobante do
         "" ->
+          query_str
+        "todos" ->
           query_str
         value ->
           case String.contains?(query_str, "WHERE") do
