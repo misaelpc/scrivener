@@ -299,7 +299,8 @@ defmodule Scrivener do
       #|> repo.one!
     {_, query_params} = Ecto.Adapters.SQL.to_sql(:all, repo, query)
 
-    rfc_emitter = Enum.at(query_params, 0)
+    IO.inspect "rfc_emitter"
+    IO.inspect rfc_emitter = Enum.at(query_params, 0)
     rfc_receiver = Enum.at(query_params, 1)
     serie = Enum.at(query_params, 2)
     folio = Enum.at(query_params, 3)
