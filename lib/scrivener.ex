@@ -195,7 +195,7 @@ defmodule Scrivener do
               true ->
                 query_str <> " AND comprobantes.rfc_receiver = '#{rfc_receiver}' "
               false ->
-                query_str <> " WHERE comprobantes.receipt_serie = '#{rfc_receiver}' "
+                query_str <> " WHERE comprobantes.rfc_receiver = '#{rfc_receiver}' "
             end
         end
 
@@ -325,9 +325,9 @@ defmodule Scrivener do
         value ->
           case String.contains?(query_str, "WHERE") do
             true ->
-              query_str <> " AND comprobantes.receipt_serie = '#{rfc_receiver}' "
+              query_str <> " AND comprobantes.rfc_receiver = '#{rfc_receiver}' "
             false ->
-              query_str <> " WHERE comprobantes.receipt_serie = '#{rfc_receiver}' "
+              query_str <> " WHERE comprobantes.rfc_receiver = '#{rfc_receiver}' "
           end
       end
 
