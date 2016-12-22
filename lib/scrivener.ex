@@ -286,7 +286,6 @@ defmodule Scrivener do
   end
 
   defp total_entries(query, repo) do
-    IO.inspect repo
     primary_key = query.from
     |> elem(1)
     |> apply(:__schema__, [:primary_key])
@@ -307,6 +306,11 @@ defmodule Scrivener do
     fecha_inicio = Enum.at(query_params, 4)
     fecha_fin = Enum.at(query_params, 5)
     tipo_comprobante = Enum.at(query_params, 6)
+
+    case repo == Bemus.Repo do
+      true ->
+
+        IO.inspect "si"
 
     query_str = "SELECT count(DISTINCT [id]) FROM [hades_sealed_cfdis] AS cfdis INNER JOIN [hades_cfdi_3_2_comprobantes] AS comprobantes ON comprobantes.document_id = cfdis.id"
 
@@ -404,6 +408,10 @@ defmodule Scrivener do
     %{columns: _, command: _, num_rows: 1, rows: [[result]]} = Ecto.Adapters.SQL.query!(repo, query_str, [])
 
     result
+
+      false -> 
+        IO.inspect "no"
+    end
   end
 
   defp total_pages(total_entries, page_size) do
