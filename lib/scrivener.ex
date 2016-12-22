@@ -175,102 +175,205 @@ defmodule Scrivener do
       tipo_comprobante = Enum.at(query_params, 6)
 
       up_limit = offset + page_size
-      query_str = "WITH \"hades_results\" AS (SELECT comprobantes.document_id, comprobantes.client_id, comprobantes.receipt_serie, comprobantes.receipt_folio, comprobantes.rfc_emitter, comprobantes.rfc_receiver, comprobantes.status, comprobantes.issue_date, comprobantes.receipt_type, comprobantes.total, cfdis.uuid, ROW_NUMBER() OVER (ORDER BY comprobantes.\"issue_date\" DESC) AS rowNum from \"hades_cfdi_3_2_comprobantes\" AS comprobantes INNER JOIN \"hades_sealed_cfdis\" cfdis ON cfdis.id = comprobantes.document_id"
 
-      #filters
-      query_str =
-        case rfc_emitter do
-          "" ->
-            query_str
-          value ->
-            query_str <> " WHERE comprobantes.rfc_emitter = '#{rfc_emitter}' "
-        end
+      case repo == Bemus.Repo do
+        true ->
 
-      query_str = 
-        case rfc_receiver do
-          "" ->
-            query_str
-          value ->
-            case String.contains?(query_str, "WHERE") do
-              true ->
-                query_str <> " AND comprobantes.rfc_receiver = '#{rfc_receiver}' "
-              false ->
-                query_str <> " WHERE comprobantes.rfc_receiver = '#{rfc_receiver}' "
+          query_str = "WITH \"hades_results\" AS (SELECT comprobantes.document_id, comprobantes.client_id, comprobantes.receipt_serie, comprobantes.receipt_folio, comprobantes.rfc_emitter, comprobantes.rfc_receiver, comprobantes.status, comprobantes.issue_date, comprobantes.receipt_type, comprobantes.total, cfdis.uuid, ROW_NUMBER() OVER (ORDER BY comprobantes.\"issue_date\" DESC) AS rowNum from \"hades_cfdi_3_2_comprobantes\" AS comprobantes INNER JOIN \"hades_sealed_cfdis\" cfdis ON cfdis.id = comprobantes.document_id"
+
+          #filters
+          query_str =
+            case rfc_emitter do
+              "" ->
+                query_str
+              value ->
+                query_str <> " WHERE comprobantes.rfc_emitter = '#{rfc_emitter}' "
             end
-        end
 
-      query_str = 
-        case serie do
-          "" ->
-            query_str
-          value ->
-            case String.contains?(query_str, "WHERE") do
-              true ->
-                query_str <> " AND comprobantes.receipt_serie = '#{serie}' "
-              false ->
-                query_str <> " WHERE comprobantes.receipt_serie = '#{serie}' "
+          query_str = 
+            case rfc_receiver do
+              "" ->
+                query_str
+              value ->
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND comprobantes.rfc_receiver = '#{rfc_receiver}' "
+                  false ->
+                    query_str <> " WHERE comprobantes.rfc_receiver = '#{rfc_receiver}' "
+                end
             end
-        end
 
-      query_str = 
-        case folio do
-          "" ->
-            query_str
-          value ->
-            case String.contains?(query_str, "WHERE") do
-              true ->
-                query_str <> " AND comprobantes.receipt_folio = '#{folio}' "
-              false ->
-                query_str <> " WHERE comprobantes.receipt_folio = '#{folio}' "
+          query_str = 
+            case serie do
+              "" ->
+                query_str
+              value ->
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND comprobantes.receipt_serie = '#{serie}' "
+                  false ->
+                    query_str <> " WHERE comprobantes.receipt_serie = '#{serie}' "
+                end
             end
-        end
 
-      query_str =
-        case fecha_inicio do
-          {{1, 1, 1}, {0, 0, 0, 0}} ->
-            query_str
-          value ->
-            {{yyyy, mm, dd}, _} = value
-            case String.contains?(query_str, "WHERE") do
-              true ->
-                query_str <> " AND comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd}' "
-              false ->
-                query_str <> " WHERE comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd}' "
+          query_str = 
+            case folio do
+              "" ->
+                query_str
+              value ->
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND comprobantes.receipt_folio = '#{folio}' "
+                  false ->
+                    query_str <> " WHERE comprobantes.receipt_folio = '#{folio}' "
+                end
             end
-        end
 
-      query_str =
-        case fecha_fin do
-          {{1, 1, 1}, {0, 0, 0, 0}} ->
-            query_str
-          value ->
-            {{yyyy, mm, dd}, _} = value
-            case String.contains?(query_str, "WHERE") do
-              true ->
-                query_str <> " AND comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
-              false ->
-                query_str <> " WHERE comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+          query_str =
+            case fecha_inicio do
+              {{1, 1, 1}, {0, 0, 0, 0}} ->
+                query_str
+              value ->
+                {{yyyy, mm, dd}, _} = value
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd}' "
+                  false ->
+                    query_str <> " WHERE comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd}' "
+                end
             end
-        end
 
-      query_str = 
-        case tipo_comprobante do
-          "" ->
-            query_str
-          "todos" ->
-            query_str
-          value ->
-            case String.contains?(query_str, "WHERE") do
-              true ->
-                query_str <> " AND comprobantes.receipt_type = '#{tipo_comprobante}' "
-              false ->
-                query_str <> " WHERE comprobantes.receipt_type = '#{tipo_comprobante}' "
+          query_str =
+            case fecha_fin do
+              {{1, 1, 1}, {0, 0, 0, 0}} ->
+                query_str
+              value ->
+                {{yyyy, mm, dd}, _} = value
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+                  false ->
+                    query_str <> " WHERE comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+                end
             end
-        end
 
-      query_str = query_str <> ") SELECT * FROM \"hades_results\" WHERE rowNum > #{offset} and RowNum <= #{up_limit}"
+          query_str = 
+            case tipo_comprobante do
+              "" ->
+                query_str
+              "todos" ->
+                query_str
+              value ->
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND comprobantes.receipt_type = '#{tipo_comprobante}' "
+                  false ->
+                    query_str <> " WHERE comprobantes.receipt_type = '#{tipo_comprobante}' "
+                end
+            end
 
-      Ecto.Adapters.SQL.query(repo, query_str, [])
+          query_str = query_str <> ") SELECT * FROM \"hades_results\" WHERE rowNum > #{offset} and RowNum <= #{up_limit}"
+
+          Ecto.Adapters.SQL.query(repo, query_str, [])
+        false ->
+
+          query_str = "WITH results AS(SELECT cfdis.idInternal, cfdis.Empresa_Id, cfdis.serie, cfdis.folio, e.rfc, cfdis.rfc, cfdis.vigente, cfdis.fechaGeneracion, cfdis.tipoDeComprobante, cfdis.montoTotal, cfdis.idInternal, ROW_NUMBER() OVER (ORDER BY cfdis.fechaGeneracion DESC) AS rowNum from CFD AS cfdis INNER JOIN EMPRESA e ON e.idInternal = cfdis.Empresa_Id"
+
+          #filters
+          query_str =
+            case rfc_emitter do
+              "" ->
+                query_str
+              value ->
+                query_str <> " WHERE e.rfc = '#{rfc_emitter}' "
+            end
+
+          query_str = 
+            case rfc_receiver do
+              "" ->
+                query_str
+              value ->
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND cfdis.rfc = '#{rfc_receiver}' "
+                  false ->
+                    query_str <> " WHERE cfdis.rfc = '#{rfc_receiver}' "
+                end
+            end
+
+          query_str = 
+            case serie do
+              "" ->
+                query_str
+              value ->
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND cfdis.serie = '#{serie}' "
+                  false ->
+                    query_str <> " WHERE cfdis.serie = '#{serie}' "
+                end
+            end
+
+          query_str = 
+            case folio do
+              "" ->
+                query_str
+              value ->
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND cfdis.folio = '#{folio}' "
+                  false ->
+                    query_str <> " WHERE cfdis.folio = '#{folio}' "
+                end
+            end
+
+          query_str =
+            case fecha_inicio do
+              {{1, 1, 1}, {0, 0, 0, 0}} ->
+                query_str
+              value ->
+                {{yyyy, mm, dd}, _} = value
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND cfdis.fechaGeneracion >= '#{yyyy}-#{mm}-#{dd}' "
+                  false ->
+                    query_str <> " WHERE cfdis.fechaGeneracion >= '#{yyyy}-#{mm}-#{dd}' "
+                end
+            end
+
+          query_str =
+            case fecha_fin do
+              {{1, 1, 1}, {0, 0, 0, 0}} ->
+                query_str
+              value ->
+                {{yyyy, mm, dd}, _} = value
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND cfdis.fechaGeneracion <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+                  false ->
+                    query_str <> " WHERE cfdis.fechaGeneracion <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+                end
+            end
+
+          query_str = 
+            case tipo_comprobante do
+              "" ->
+                query_str
+              "todos" ->
+                query_str
+              value ->
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND cfdis.tipoDeComprobante = '#{tipo_comprobante}' "
+                  false ->
+                    query_str <> " WHERE cfdis.tipoDeComprobante = '#{tipo_comprobante}' "
+                end
+            end
+
+          query_str = query_str <> ") SELECT * FROM \"results\" WHERE rowNum > #{offset} and RowNum <= #{up_limit}"
+
+          Ecto.Adapters.SQL.query(repo, query_str, [])
+      end
     end
   end
 
@@ -310,107 +413,200 @@ defmodule Scrivener do
     case repo == Bemus.Repo do
       true ->
 
-        IO.inspect "si"
+        query_str = "SELECT count(DISTINCT [id]) FROM [hades_sealed_cfdis] AS cfdis INNER JOIN [hades_cfdi_3_2_comprobantes] AS comprobantes ON comprobantes.document_id = cfdis.id"
 
-    query_str = "SELECT count(DISTINCT [id]) FROM [hades_sealed_cfdis] AS cfdis INNER JOIN [hades_cfdi_3_2_comprobantes] AS comprobantes ON comprobantes.document_id = cfdis.id"
-
-    #filters
-    query_str =
-      case rfc_emitter do
-        "" ->
-          query_str
-        value ->
-          query_str <> " WHERE comprobantes.rfc_emitter = '#{rfc_emitter}' "
-      end
-
-    query_str = 
-      case rfc_receiver do
-        "" ->
-          query_str
-        value ->
-          case String.contains?(query_str, "WHERE") do
-            true ->
-              query_str <> " AND comprobantes.rfc_receiver = '#{rfc_receiver}' "
-            false ->
-              query_str <> " WHERE comprobantes.rfc_receiver = '#{rfc_receiver}' "
+        #filters
+        query_str =
+          case rfc_emitter do
+            "" ->
+              query_str
+            value ->
+              query_str <> " WHERE comprobantes.rfc_emitter = '#{rfc_emitter}' "
           end
-      end
 
-    query_str = 
-      case serie do
-        "" ->
-          query_str
-        value ->
-          case String.contains?(query_str, "WHERE") do
-            true ->
-              query_str <> " AND comprobantes.receipt_serie = '#{serie}' "
-            false ->
-              query_str <> " WHERE comprobantes.receipt_serie = '#{serie}' "
+        query_str = 
+          case rfc_receiver do
+            "" ->
+              query_str
+            value ->
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND comprobantes.rfc_receiver = '#{rfc_receiver}' "
+                false ->
+                  query_str <> " WHERE comprobantes.rfc_receiver = '#{rfc_receiver}' "
+              end
           end
-      end
 
-    query_str = 
-      case folio do
-        "" ->
-          query_str
-        value ->
-          case String.contains?(query_str, "WHERE") do
-            true ->
-              query_str <> " AND comprobantes.receipt_folio = '#{folio}' "
-            false ->
-              query_str <> " WHERE comprobantes.receipt_folio = '#{folio}' "
+        query_str = 
+          case serie do
+            "" ->
+              query_str
+            value ->
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND comprobantes.receipt_serie = '#{serie}' "
+                false ->
+                  query_str <> " WHERE comprobantes.receipt_serie = '#{serie}' "
+              end
           end
-      end
 
-    query_str =
-      case fecha_inicio do
-        {{1, 1, 1}, {0, 0, 0, 0}} ->
-          query_str
-        value ->
-          {{yyyy, mm, dd}, _} = value
-          case String.contains?(query_str, "WHERE") do
-            true ->
-              query_str <> " AND comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd}' "
-            false ->
-              query_str <> " WHERE comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd}' "
+        query_str = 
+          case folio do
+            "" ->
+              query_str
+            value ->
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND comprobantes.receipt_folio = '#{folio}' "
+                false ->
+                  query_str <> " WHERE comprobantes.receipt_folio = '#{folio}' "
+              end
           end
-      end
 
-    query_str =
-      case fecha_fin do
-        {{1, 1, 1}, {0, 0, 0, 0}} ->
-          query_str
-        value ->
-          {{yyyy, mm, dd}, _} = value
-          case String.contains?(query_str, "WHERE") do
-            true ->
-              query_str <> " AND comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
-            false ->
-              query_str <> " WHERE comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+        query_str =
+          case fecha_inicio do
+            {{1, 1, 1}, {0, 0, 0, 0}} ->
+              query_str
+            value ->
+              {{yyyy, mm, dd}, _} = value
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd}' "
+                false ->
+                  query_str <> " WHERE comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd}' "
+              end
           end
-      end
 
-    query_str = 
-      case tipo_comprobante do
-        "" ->
-          query_str
-        "todos" ->
-          query_str
-        value ->
-          case String.contains?(query_str, "WHERE") do
-            true ->
-              query_str <> " AND comprobantes.receipt_type = '#{tipo_comprobante}' "
-            false ->
-              query_str <> " WHERE comprobantes.receipt_type = '#{tipo_comprobante}' "
+        query_str =
+          case fecha_fin do
+            {{1, 1, 1}, {0, 0, 0, 0}} ->
+              query_str
+            value ->
+              {{yyyy, mm, dd}, _} = value
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+                false ->
+                  query_str <> " WHERE comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+              end
           end
-      end
 
-    %{columns: _, command: _, num_rows: 1, rows: [[result]]} = Ecto.Adapters.SQL.query!(repo, query_str, [])
+        query_str = 
+          case tipo_comprobante do
+            "" ->
+              query_str
+            "todos" ->
+              query_str
+            value ->
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND comprobantes.receipt_type = '#{tipo_comprobante}' "
+                false ->
+                  query_str <> " WHERE comprobantes.receipt_type = '#{tipo_comprobante}' "
+              end
+          end
 
-    result
+        %{columns: _, command: _, num_rows: 1, rows: [[result]]} = Ecto.Adapters.SQL.query!(repo, query_str, [])
 
+        result
       false -> 
-        IO.inspect "no"
+        query_str = "SELECT count(DISTINCT [cfdis].[idInternal]) FROM [CFD] AS cfdis INNER JOIN EMPRESA e ON E.idInternal = CFDIS.Empresa_Id"
+
+        #filters
+        query_str =
+          case rfc_emitter do
+            "" ->
+              query_str
+            value ->
+              query_str <> " WHERE e.rfc = '#{rfc_emitter}' "
+          end
+
+        query_str = 
+          case rfc_receiver do
+            "" ->
+              query_str
+            value ->
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND cfdis.rfc = '#{rfc_receiver}' "
+                false ->
+                  query_str <> " WHERE cfdis.rfc = '#{rfc_receiver}' "
+              end
+          end
+
+        query_str = 
+          case serie do
+            "" ->
+              query_str
+            value ->
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND cfdis.serie = '#{serie}' "
+                false ->
+                  query_str <> " WHERE cfdis.serie = '#{serie}' "
+              end
+          end
+
+        query_str = 
+          case folio do
+            "" ->
+              query_str
+            value ->
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND cfdis.folio = '#{folio}' "
+                false ->
+                  query_str <> " WHERE cfdis.folio = '#{folio}' "
+              end
+          end
+
+        query_str =
+          case fecha_inicio do
+            {{1, 1, 1}, {0, 0, 0, 0}} ->
+              query_str
+            value ->
+              {{yyyy, mm, dd}, _} = value
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND cfdis.fechaGeneracion >= '#{yyyy}-#{mm}-#{dd}' "
+                false ->
+                  query_str <> " WHERE cfdis.fechaGeneracion >= '#{yyyy}-#{mm}-#{dd}' "
+              end
+          end
+
+        query_str =
+          case fecha_fin do
+            {{1, 1, 1}, {0, 0, 0, 0}} ->
+              query_str
+            value ->
+              {{yyyy, mm, dd}, _} = value
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND cfdis.fechaGeneracion <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+                false ->
+                  query_str <> " WHERE cfdis.fechaGeneracion <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+              end
+          end
+
+        query_str = 
+          case tipo_comprobante do
+            "" ->
+              query_str
+            "todos" ->
+              query_str
+            value ->
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND cfdis.tipoDeComprobante = '#{tipo_comprobante}' "
+                false ->
+                  query_str <> " WHERE cfdis.tipoDeComprobante = '#{tipo_comprobante}' "
+              end
+          end
+
+        %{columns: _, command: _, num_rows: 1, rows: [[result]]} = Ecto.Adapters.SQL.query!(repo, query_str, [])
+
+        result
+
     end
   end
 
