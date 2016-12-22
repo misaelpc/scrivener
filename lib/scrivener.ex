@@ -277,7 +277,7 @@ defmodule Scrivener do
           Ecto.Adapters.SQL.query(repo, query_str, [])
         false ->
 
-          query_str = "WITH results AS(SELECT cfdis.idInternal, cfdis.Empresa_Id, cfdis.serie, cfdis.folio, e.rfc, cfdis.rfc, cfdis.vigente, cfdis.fechaGeneracion, cfdis.tipoDeComprobante, cfdis.montoTotal, cfdis.idInternal, ROW_NUMBER() OVER (ORDER BY cfdis.fechaGeneracion DESC) AS rowNum from CFD AS cfdis INNER JOIN EMPRESA e ON e.idInternal = cfdis.Empresa_Id"
+          query_str = "WITH results AS(SELECT cfdis.idInternal AS document_id, cfdis.Empresa_Id AS client_id, cfdis.serie AS receipt_serie, cfdis.folio AS receipt_folio, e.rfc AS rfc_emitter, cfdis.rfc AS rfc_receiver, cfdis.vigente AS status, cfdis.fechaGeneracion AS issue_date, cfdis.tipoDeComprobante AS receipt_type, cfdis.montoTotal AS total, cfdis.idInternal AS uuid, ROW_NUMBER() OVER (ORDER BY cfdis.fechaGeneracion DESC) AS rowNum from CFD AS cfdis INNER JOIN EMPRESA e ON e.idInternal = cfdis.Empresa_Id"
 
           #filters
           query_str =
