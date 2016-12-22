@@ -409,7 +409,7 @@ defmodule Scrivener do
     fecha_inicio = Enum.at(query_params, 4)
     fecha_fin = Enum.at(query_params, 5)
     tipo_comprobante = Enum.at(query_params, 6)
-IO.inspect repo
+
     case repo == Bemus.Repo do
       true ->
 
