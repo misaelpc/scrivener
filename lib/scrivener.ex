@@ -173,6 +173,7 @@ defmodule Scrivener do
       fecha_inicio = Enum.at(query_params, 4)
       fecha_fin = Enum.at(query_params, 5)
       tipo_comprobante = Enum.at(query_params, 6)
+      monto = Enum.at(query_params, 7)
 
       up_limit = offset + page_size
 
@@ -269,6 +270,19 @@ defmodule Scrivener do
                     query_str <> " AND comprobantes.receipt_type = '#{tipo_comprobante}' "
                   false ->
                     query_str <> " WHERE comprobantes.receipt_type = '#{tipo_comprobante}' "
+                end
+            end
+
+          query_str =
+            case monto do
+              "" ->
+                query_str
+              value ->
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND comprobantes.total = '#{monto}' "
+                  false ->
+                    query_str <> " WHERE comprobantes.total = '#{monto}' "
                 end
             end
 
@@ -370,6 +384,19 @@ defmodule Scrivener do
                 end
             end
 
+          query_str =
+            case monto do
+              "" ->
+                query_str
+              value ->
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND cfdis.montoTotal = '#{monto}' "
+                  false ->
+                    query_str <> " WHERE cfdis.montoTotal = '#{monto}' "
+                end
+            end
+
           query_str = query_str <> ") SELECT * FROM \"results\" WHERE rowNum > #{offset} and RowNum <= #{up_limit}"
 
           Ecto.Adapters.SQL.query(repo, query_str, [])
@@ -409,6 +436,7 @@ defmodule Scrivener do
     fecha_inicio = Enum.at(query_params, 4)
     fecha_fin = Enum.at(query_params, 5)
     tipo_comprobante = Enum.at(query_params, 6)
+    monto = Enum.at(query_params, 7)
 
     case repo == Bemus.Repo do
       true ->
@@ -506,6 +534,19 @@ defmodule Scrivener do
               end
           end
 
+        query_str =
+          case monto do
+            "" ->
+              query_str
+            value ->
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND comprobantes.total = '#{monto}' "
+                false ->
+                  query_str <> " WHERE comprobantes.total = '#{monto}' "
+              end
+          end
+
         %{columns: _, command: _, num_rows: 1, rows: [[result]]} = Ecto.Adapters.SQL.query!(repo, query_str, [])
 
         result
@@ -600,6 +641,19 @@ defmodule Scrivener do
                   query_str <> " AND cfdis.tipoDeComprobante = '#{tipo_comprobante}' "
                 false ->
                   query_str <> " WHERE cfdis.tipoDeComprobante = '#{tipo_comprobante}' "
+              end
+          end
+
+        query_str =
+          case monto do
+            "" ->
+              query_str
+            value ->
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND cfdis.montoTotal = '#{monto}' "
+                false ->
+                  query_str <> " WHERE cfdis.montoTotal = '#{monto}' "
               end
           end
 
