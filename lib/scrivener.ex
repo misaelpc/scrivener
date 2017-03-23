@@ -172,8 +172,9 @@ defmodule Scrivener do
       folio = Enum.at(query_params, 3)
       fecha_inicio = Enum.at(query_params, 4)
       fecha_fin = Enum.at(query_params, 5)
-      tipo_comprobante = Enum.at(query_params, 6)
-      monto = Enum.at(query_params, 7)
+      limit_date = Enum.at(query_params, 6)
+      tipo_comprobante = Enum.at(query_params, 7)
+      monto = Enum.at(query_params, 8)
 
       up_limit = offset + page_size
 
@@ -258,6 +259,20 @@ defmodule Scrivener do
                 end
             end
 
+          query_str =
+            case limit_date do
+              {{1, 1, 1}, {0, 0, 0, 0}} ->
+                query_str
+              value ->
+                {{yyyy, mm, dd}, _} = value
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+                  false ->
+                    query_str <> " WHERE comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+                end
+            end
+          
           query_str = 
             case tipo_comprobante do
               "" ->
@@ -286,6 +301,7 @@ defmodule Scrivener do
                 end
             end
 
+          
           query_str = query_str <> ") SELECT * FROM \"hades_results\" WHERE rowNum > #{offset} and RowNum <= #{up_limit}"
 
           Ecto.Adapters.SQL.query(repo, query_str, [])
@@ -369,6 +385,20 @@ defmodule Scrivener do
                 end
             end
 
+          query_str =
+            case limit_date do
+              {{1, 1, 1}, {0, 0, 0, 0}} ->
+                query_str
+              value ->
+                {{yyyy, mm, dd}, _} = value
+                case String.contains?(query_str, "WHERE") do
+                  true ->
+                    query_str <> " AND cfdis.fechaGeneracion >= '#{yyyy}-#{mm}-#{dd}' "
+                  false ->
+                    query_str <> " WHERE cfdis.fechaGeneracion >= '#{yyyy}-#{mm}-#{dd}' "
+                end
+            end
+          
           query_str = 
             case tipo_comprobante do
               "" ->
@@ -435,8 +465,9 @@ defmodule Scrivener do
     folio = Enum.at(query_params, 3)
     fecha_inicio = Enum.at(query_params, 4)
     fecha_fin = Enum.at(query_params, 5)
-    tipo_comprobante = Enum.at(query_params, 6)
-    monto = Enum.at(query_params, 7)
+    limit_date = Enum.at(query_params, 6)
+    tipo_comprobante = Enum.at(query_params, 7)
+    monto = Enum.at(query_params, 8)
 
     case repo == Bemus.Repo do
       true ->
@@ -516,6 +547,20 @@ defmodule Scrivener do
                   query_str <> " AND comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
                 false ->
                   query_str <> " WHERE comprobantes.issue_date <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+              end
+          end
+
+        query_str =
+          case limit_date do
+            {{1, 1, 1}, {0, 0, 0, 0}} ->
+              query_str
+            value ->
+              {{yyyy, mm, dd}, _} = value
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+                false ->
+                  query_str <> " WHERE comprobantes.issue_date >= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
               end
           end
 
@@ -626,6 +671,20 @@ defmodule Scrivener do
                   query_str <> " AND cfdis.fechaGeneracion <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
                 false ->
                   query_str <> " WHERE cfdis.fechaGeneracion <= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+              end
+          end
+
+        query_str =
+          case limit_date do
+            {{1, 1, 1}, {0, 0, 0, 0}} ->
+              query_str
+            value ->
+              {{yyyy, mm, dd}, _} = value
+              case String.contains?(query_str, "WHERE") do
+                true ->
+                  query_str <> " AND cfdis.fechaGeneracion >= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
+                false ->
+                  query_str <> " WHERE cfdis.fechaGeneracion >= '#{yyyy}-#{mm}-#{dd} 23:59:59' "
               end
           end
 
