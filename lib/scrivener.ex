@@ -172,8 +172,9 @@ defmodule Scrivener do
       folio = Enum.at(query_params, 3)
       fecha_inicio = Enum.at(query_params, 4)
       fecha_fin = Enum.at(query_params, 5)
-      tipo_comprobante = Enum.at(query_params, 6)
-      monto = Enum.at(query_params, 7)
+      limit_date = Enum.at(query_params, 6)
+      tipo_comprobante = Enum.at(query_params, 7)
+      monto = Enum.at(query_params, 8)
 
       up_limit = offset + page_size
 
